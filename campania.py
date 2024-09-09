@@ -87,7 +87,7 @@ class campania:
             raise ValueError("fecha_termino debe ser de tipo 'date'.")
         self._fecha_termino = value
 
-    def agregar_anuncio(sefl, tipo: str, anuncio_data: dict):
+    def agregar_anuncio(self, tipo: str, anuncio_data: dict):
         """
         Agrega un anuncio a la campaña según el tipo especificado.
 
