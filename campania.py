@@ -1,5 +1,6 @@
 from datetime import date
-from anuncio import Video, Display, Social, SubTipoInvalidoError
+from anuncio import Video, Display, Social
+from error import LargoExcedidoException, SubTipoInvalidoException
 
 
 # Excepción para error de largo de anuncios
@@ -43,16 +44,26 @@ class campania:
             La fecha de inicio de la campaña.
         fecha_termino : date
             La fecha de término de la campaña.
+
+        Raises
+        ------
+        LargoExcedidoException:
+            Si el nombre de la campaña excede los 250 caracteres.
         """
+        if len(nombre) > 250:
+            raise LargoExcedidoException(
+                "El nombre de la campaña excese los 250 caracteres.)"
+            )
+
         self.nombre = nombre
-        self.fecha_inicio = fecha_inicio
-        self.fecha_termino = fecha_termino
+        self._fecha_inicio = fecha_inicio
+        self._fecha_termino = fecha_termino
         self.anuncios = []
 
     # Propiedades y setters para decha_inicio y fecha_termino
     @property
     def fecha_inicio(self):
-        return self.fecha_inicio
+        return self._fecha_inicio
 
     @fecha_inicio.setter
     def fecha_inicio(self, value):
@@ -65,7 +76,7 @@ class campania:
 
     @property
     def fecha_termino(self):
-        return self.fecha_termino
+        return self._fecha_termino
 
     @fecha_termino.setter
     def fecha_termino(self, value):
@@ -105,5 +116,28 @@ class campania:
             else:
                 # Si el tipo de anuncio no es válido, lanza un error.
                 raise ValueError(f"Tipo de anuncio'{tipo} no es válido.")
-        except SubTipoInvalidoError as e:
+        except SubTipoInvalidoException as e:
             print(f"Error al agregar anuncio {e}")
+
+    def __str__(self):
+        """
+        Retorna una representación en cadena de la campaña con el número de anuncios por tipo.
+
+        Retorna
+        -------
+        str
+            Resumen de la campaña indicando el nombre y la cantidad de anuncios por tipo.
+        """
+        video_count = sum(1 for anuncio in self.anuncios if isinstance(anuncio, Video))
+        display_count = sum(
+            1 for anuncio in self.anuncios if isinstance(anuncio, Display)
+        )
+        social_count = sum(
+            1 for anuncio in self.anuncios if isinstance(anuncio, Social)
+        )
+
+        return (
+            f"Nombre de la campaña: {self.nombre}\n"
+            f"Fechas: {self.fecha_inicio} - {self.fecha_termino}\n"
+            f"Anuncios: {video_count} Video(s), {display_count} Display(s), {social_count} Social(es)"
+        )
