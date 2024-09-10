@@ -1,113 +1,101 @@
-class Anuncio:
-    """
-    Clase base para representar un anuncio publicitario.
+from abc import ABC, abstractmethod
 
-    Atributos:
-        alto (int): Altura del anuncio, debe ser mayor a 0.
-        ancho (int): Ancho del anuncio, debe ser mayor a 0.
-        sub_tipo (str): Subtipo de anuncio permitido.
+class SubTipoInvalidoError(Exception):
+    pass
 
-    Métodos:
-        mostrar_formatos(): Método estático que muestra los formatos y subtipos disponibles.
-    """
+class Anuncio(ABC):
+    def __init__(self, ancho: int, alto: int, url_archivo: str, url_clic: str, sub_tipo: str):
+        self._ancho = ancho if ancho > 0 else 1
+        self._alto = alto if alto > 0 else 1
+        self._url_archivo = url_archivo
+        self._url_clic = url_clic
+        self.sub_tipo = sub_tipo  # Utiliza el setter para validación
 
-    def __init__(self, alto, ancho, sub_tipo):
-        """
-        Inicializa un anuncio con los valores de alto, ancho y subtipo.
+    @abstractmethod
+    def comprimir_anuncio(self):
+        pass
 
-        Parámetros:
-            alto (int): Altura del anuncio.
-            ancho (int): Ancho del anuncio.
-            sub_tipo (str): Subtipo del anuncio.
-
-        Excepciones:
-            SubTipoInvalidoException: Si el subtipo no es válido para el tipo de anuncio.
-        """
-        self.alto = alto if alto > 0 else 1
-        self.ancho = ancho if ancho > 0 else 1
-        if sub_tipo in self.SUB_TIPOS:
-            self.sub_tipo = sub_tipo
-        else:
-            raise Exception("SubTipoInvalidoException")
+    @abstractmethod
+    def redimensionar_anuncio(self):
+        pass
 
     @staticmethod
     def mostrar_formatos():
         """
-        Muestra los formatos disponibles para los anuncios.
-
-        Retorna:
-            None
+        Colabora con todas las subclases de Anuncio para mostrar los formatos y subtipos disponibles.
         """
-        print("Formatos disponibles:")
-        for subtipo in Anuncio.SUB_TIPOS:
-            print(f"- {subtipo}")
+        
+        for cls in Anuncio.__subclasses__():
+            print(f"FORMATO {cls.FORMATO}:")
+            print("==========")
+            for subtipo in cls.SUB_TIPOS:
+                print(f"- {subtipo}")
+
+    @property
+    def ancho(self):
+        return self._ancho
+
+    @ancho.setter
+    def ancho(self, value):
+        self._ancho = value if value > 0 else 1
+
+    @property
+    def alto(self):
+        return self._alto
+
+    @alto.setter
+    def alto(self, value):
+        self._alto = value if value > 0 else 1
+
+    @property
+    def sub_tipo(self):
+        return self._sub_tipo
+
+    @sub_tipo.setter
+    def sub_tipo(self, value):
+        if value not in self.SUB_TIPOS:
+            raise SubTipoInvalidoError(f"Subtipo {value} no válido para {self.FORMATO}")
+        self._sub_tipo = value
 
 
 class Video(Anuncio):
-    """
-    Clase que representa un anuncio de tipo Video.
+    FORMATO = "Video"
+    SUB_TIPOS = ("instream", "outstream")
 
-    Atributos:
-        duracion (int): Duración del video en segundos, debe ser mayor a 0.
-
-    Métodos:
-        comprimir_anuncio(): Muestra un mensaje que indica que la compresión no está implementada.
-        redimensionar_anuncio(): Muestra un mensaje que indica que el recorte no está implementado.
-    """
-
-    def __init__(self, duracion):
-        """
-        Inicializa un anuncio de tipo Video.
-
-        Parámetros:
-            duracion (int): Duración del video.
-
-        Excepciones:
-            Ninguna, pero si la duración es menor o igual a 0, se asigna un valor de 5 segundos.
-        """
-        super().__init__(1, 1, "Corto")
+    def __init__(self, url_archivo: str, url_clic: str, sub_tipo: str, duracion: int):
+        super().__init__(ancho=1, alto=1, url_archivo=url_archivo, url_clic=url_clic, sub_tipo=sub_tipo)
         self.duracion = duracion if duracion > 0 else 5
 
     def comprimir_anuncio(self):
-        """Muestra un mensaje indicando que la compresión de video no está implementada."""
         print("COMPRESIÓN DE VIDEO NO IMPLEMENTADA AÚN")
 
     def redimensionar_anuncio(self):
-        """Muestra un mensaje indicando que el recorte de video no está implementado."""
         print("RECORTE DE VIDEO NO IMPLEMENTADO AÚN")
 
 
 class Display(Anuncio):
-    """
-    Clase que representa un anuncio de tipo Display.
+    FORMATO = "Display"
+    SUB_TIPOS = ("tradicional", "native")
 
-    Métodos:
-        comprimir_anuncio(): Muestra un mensaje que indica que la compresión no está implementada.
-        redimensionar_anuncio(): Muestra un mensaje que indica que el redimensionamiento no está implementado.
-    """
+    def __init__(self, ancho: int, alto: int, url_archivo: str, url_clic: str, sub_tipo: str):
+        super().__init__(ancho, alto, url_archivo, url_clic, sub_tipo)
 
     def comprimir_anuncio(self):
-        """Muestra un mensaje indicando que la compresión de anuncios Display no está implementada."""
         print("COMPRESIÓN DE ANUNCIOS DISPLAY NO IMPLEMENTADA AÚN")
 
     def redimensionar_anuncio(self):
-        """Muestra un mensaje indicando que el redimensionamiento de anuncios Display no está implementado."""
         print("REDIMENSIONAMIENTO DE ANUNCIOS DISPLAY NO IMPLEMENTADO AÚN")
 
 
 class Social(Anuncio):
-    """
-    Clase que representa un anuncio de tipo Social.
+    FORMATO = "Social"
+    SUB_TIPOS = ("facebook", "linkedin")
 
-    Métodos:
-        comprimir_anuncio(): Muestra un mensaje que indica que la compresión no está implementada.
-        redimensionar_anuncio(): Muestra un mensaje que indica que el redimensionamiento no está implementado.
-    """
+    def __init__(self, ancho: int, alto: int, url_archivo: str, url_clic: str, sub_tipo: str):
+        super().__init__(ancho, alto, url_archivo, url_clic, sub_tipo)
 
     def comprimir_anuncio(self):
-        """Muestra un mensaje indicando que la compresión de anuncios de redes sociales no está implementada."""
         print("COMPRESIÓN DE ANUNCIOS DE REDES SOCIALES NO IMPLEMENTADA AÚN")
 
     def redimensionar_anuncio(self):
-        """Muestra un mensaje indicando que el redimensionamiento de anuncios de redes sociales no está implementado."""
         print("REDIMENSIONAMIENTO DE ANUNCIOS DE REDES SOCIALES NO IMPLEMENTADO AÚN")
