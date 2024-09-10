@@ -1,42 +1,37 @@
-from campania import campania
-from anuncio import Video
-from error import LargoExcedidoException, SubTipoInvalidoException
+from campaña import Campaña, LargoExcedidoError
+from anuncio import SubTipoInvalidoError
 from datetime import date
 
 # Crear campaña inicial con un anuncio de tipo Video
 anuncios_data = [
     {
-        "tipo": "Video",
-        "anuncio_data": {
+        "tipo": "video",
+        "params": {
+            "url_archivo": "http://video.mp4",
+            "url_clic": "https://www.youtube.com/watch?v=an7krXQW4aU",
+            "sub_tipo": "instream",
             "duracion": 10
         }
     }
 ]
 
-# Crear la campaña
+campaña = Campaña("Campaña inicial", date(2024, 1, 1), date(2024, 12, 31), anuncios_data)
+
 try:
-    campaña = campania("Campaña inicial", date(2024, 1, 1), date(2024, 12, 31))
-
-    for anuncio_data in anuncios_data:
-        tipo = anuncio_data["tipo"]
-        data = anuncio_data["anuncio_data"]
-        campaña.agregar_anuncio(tipo, data)
-
     # Solicitar nuevo nombre de la campaña
     nuevo_nombre = input("Ingrese el nuevo nombre de la campaña: ")
     campaña.nombre = nuevo_nombre
 
     # Solicitar nuevo subtipo para el anuncio
     nuevo_subtipo = input("Ingrese el nuevo subtipo del anuncio: ")
-    if campaña.anuncios:
-        campaña.anuncios[0].sub_tipo = nuevo_subtipo
+    campaña.anuncios[0].sub_tipo = nuevo_subtipo
 
-except LargoExcedidoException as e:
+except LargoExcedidoError as e:
     with open('error.log', 'a') as f:
         f.write(f"Error: {e}\n")
     print(f"Error: {e}")
 
-except SubTipoInvalidoException as e:
+except SubTipoInvalidoError as e:
     with open('error.log', 'a') as f:
         f.write(f"Error: {e}\n")
     print(f"Error: {e}")
